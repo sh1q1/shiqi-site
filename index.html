@@ -4,78 +4,31 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>shiqi.site/</title>
-<!-- Cascadia Mono variable font — supports all weights + italic -->
-<link rel="preconnect" href="https://cdn.jsdelivr.net">
-<style>
-  /* Cascadia Mono — italic (cursive variant via ss01) */
-  @font-face {
-    font-family: 'Cascadia Mono';
-    src: url('https://cdn.jsdelivr.net/fontsource/fonts/cascadia-mono:vf@latest/latin-wght-italic.woff2') format('woff2-variations');
-    font-weight: 200 700;
-    font-style: italic;
-    font-display: swap;
-  }
-  /* Cascadia Mono — normal */
-  @font-face {
-    font-family: 'Cascadia Mono';
-    src: url('https://cdn.jsdelivr.net/fontsource/fonts/cascadia-mono:vf@latest/latin-wght-normal.woff2') format('woff2-variations');
-    font-weight: 200 700;
-    font-style: normal;
-    font-display: swap;
-  }
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@1,200&family=Cascadia+Mono:ital,wght@0,200..700;1,200..700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --gx: 50%;
-    --gy: 50%;
-    --password: 'shiqi'; /* not used in CSS, just a note */
-  }
 
   html, body {
     height: 100%;
     background: #000;
     color: #fff;
-    font-family: 'Cascadia Mono', 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
+    font-family: 'Cascadia Code', 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
     -webkit-font-smoothing: antialiased;
     overflow: hidden;
   }
 
-  /* ---- Background gradient layers ---- */
-
-  /* Outer slow ambient glow */
-  .bg-ambient {
-    position: fixed;
-    inset: -20%;
-    background: radial-gradient(
-      ellipse 55% 55% at var(--gx) var(--gy),
-      #0a00e6 0%,
-      #05008a 22%,
-      #020040 42%,
-      #000010 62%,
-      #000000 78%
-    );
-    z-index: 0;
-    will-change: background;
-    transition: background 0.05s linear;
-  }
-
-  /* Inner tight bright core */
-  .bg-core {
+  /* WebGL canvas background */
+  #bg-canvas {
     position: fixed;
     inset: 0;
-    background: radial-gradient(
-      ellipse 28% 28% at var(--gx) var(--gy),
-      rgba(30, 20, 255, 0.35) 0%,
-      rgba(10, 0, 200, 0.15) 35%,
-      transparent 65%
-    );
+    width: 100%;
+    height: 100%;
     z-index: 0;
-    will-change: background;
   }
 
-  /* ---- Content ---- */
+  /* Content layers */
   #lock, #content {
     position: relative;
     z-index: 1;
@@ -93,19 +46,10 @@
     inset: 0;
     transition: opacity 0.8s ease 0.2s;
   }
-  #content.visible {
-    opacity: 1;
-    pointer-events: all;
-  }
+  #content.visible { opacity: 1; pointer-events: all; }
 
-  #lock {
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
-  #lock.out {
-    opacity: 0;
-    transform: translateY(-10px);
-    pointer-events: none;
-  }
+  #lock { transition: opacity 0.6s ease, transform 0.6s ease; }
+  #lock.out { opacity: 0; transform: translateY(-10px); pointer-events: none; }
 
   .inner {
     display: flex;
@@ -116,7 +60,6 @@
     max-width: 90vw;
   }
 
-  /* Title block */
   .title-block {
     display: flex;
     flex-direction: column;
@@ -127,10 +70,9 @@
   }
 
   .wordmark {
-    font-family: 'Cascadia Mono', 'Cascadia Code', monospace;
+    font-family: 'Cascadia Code', 'Cascadia Mono', monospace;
     font-style: italic;
     font-weight: 200;
-    font-variation-settings: 'wght' 200;
     font-feature-settings: 'ss01' 1, 'calt' 1;
     font-size: 64px;
     letter-spacing: -3.2px;
@@ -141,7 +83,7 @@
   }
 
   .wip-label {
-    font-family: 'Cascadia Mono', 'Cascadia Code', monospace;
+    font-family: 'Cascadia Code', 'Cascadia Code', monospace;
     font-weight: 700;
     font-style: normal;
     font-size: 20px;
@@ -151,7 +93,6 @@
     width: 100%;
   }
 
-  /* Password input */
   .pw-wrap {
     width: 100%;
     border-bottom: 1px solid rgba(255,255,255,0.5);
@@ -166,7 +107,7 @@
     border: none;
     outline: none;
     width: 100%;
-    font-family: 'Cascadia Mono', monospace;
+    font-family: 'Cascadia Code', monospace;
     font-weight: 300;
     font-size: 20px;
     letter-spacing: 0.02em;
@@ -174,23 +115,15 @@
     text-align: center;
     caret-color: #fff;
   }
+  .pw-input::placeholder { color: rgba(255,255,255,0.5); font-weight: 300; }
+  .pw-input.error { animation: shake 0.35s ease; }
 
-  .pw-input::placeholder {
-    color: rgba(255,255,255,0.5);
-    font-weight: 300;
-  }
-
-  .pw-input.error {
-    animation: shake 0.35s ease;
-  }
-
-  /* Enter button */
   .enter-btn {
     background: #fff;
     border: 1px solid #fff;
     padding: 12px 24px;
     cursor: pointer;
-    font-family: 'Cascadia Mono', monospace;
+    font-family: 'Cascadia Code', monospace;
     font-weight: 400;
     font-size: 24px;
     letter-spacing: -0.05em;
@@ -199,19 +132,11 @@
     transition: background 0.2s, color 0.2s;
     line-height: 1.4;
   }
+  .enter-btn:hover { background: transparent; color: #fff; }
+  .enter-btn:active { transform: scale(0.98); }
 
-  .enter-btn:hover {
-    background: transparent;
-    color: #fff;
-  }
-
-  .enter-btn:active {
-    transform: scale(0.98);
-  }
-
-  /* Error hint */
   .pw-hint {
-    font-family: 'Cascadia Mono', monospace;
+    font-family: 'Cascadia Code', monospace;
     font-size: 11px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -223,17 +148,14 @@
   }
   .pw-hint.show { opacity: 1; }
 
-  /* WIP content (post-password) */
-  .wip-content {
-    text-align: center;
-  }
+  .wip-content { text-align: center; }
   .wip-content .wordmark {
     text-align: center;
     margin-bottom: 1rem;
     font-size: clamp(36px, 6vw, 56px);
   }
   .wip-body {
-    font-family: 'Cascadia Mono', monospace;
+    font-family: 'Cascadia Code', monospace;
     font-weight: 300;
     font-size: 14px;
     letter-spacing: 0.05em;
@@ -243,7 +165,7 @@
   }
   .wip-contact {
     margin-top: 2rem;
-    font-family: 'Cascadia Mono', monospace;
+    font-family: 'Cascadia Code', monospace;
     font-size: 13px;
     letter-spacing: 0.05em;
     color: rgba(255,255,255,0.4);
@@ -252,10 +174,7 @@
     padding-bottom: 2px;
     transition: color 0.2s, border-color 0.2s;
   }
-  .wip-contact:hover {
-    color: rgba(255,255,255,0.8);
-    border-color: rgba(255,255,255,0.5);
-  }
+  .wip-contact:hover { color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.5); }
 
   @keyframes shake {
     0%, 100% { transform: translateX(0); }
@@ -263,21 +182,11 @@
     60%       { transform: translateX(7px); }
     80%       { transform: translateX(-3px); }
   }
-
-  /* Touch/mobile: no cursor, gradient stays centered with slow drift */
-  @media (hover: none) {
-    .bg-ambient { animation: drift 8s ease-in-out infinite alternate; }
-    @keyframes drift {
-      from { --gx: 45%; --gy: 45%; }
-      to   { --gx: 55%; --gy: 55%; }
-    }
-  }
 </style>
 </head>
 <body>
 
-<div class="bg-ambient" id="bg-ambient"></div>
-<div class="bg-core"    id="bg-core"></div>
+<canvas id="bg-canvas"></canvas>
 
 <!-- Lock screen -->
 <div id="lock">
@@ -287,14 +196,7 @@
       <div class="wip-label">Work in progress...</div>
     </div>
     <div class="pw-wrap">
-      <input
-        class="pw-input"
-        id="pw"
-        type="password"
-        placeholder="Password"
-        autocomplete="off"
-        autofocus
-      >
+      <input class="pw-input" id="pw" type="password" placeholder="Password" autocomplete="off" autofocus>
     </div>
     <div class="pw-hint" id="pw-hint">Incorrect password</div>
     <button class="enter-btn" id="pw-btn">Enter</button>
@@ -306,7 +208,7 @@
   <div class="inner wip-content">
     <div class="wordmark">shiqi.site/</div>
     <div class="wip-body">
-      Type design & graphic work.<br>
+      Type design &amp; graphic work.<br>
       New site coming soon.
     </div>
     <a href="mailto:shiiiqiiii@gmail.com" class="wip-contact">shiiiqiiii@gmail.com</a>
@@ -314,83 +216,192 @@
 </div>
 
 <script>
-  /* ---- Change password here ---- */
-  var PASSWORD = 'shiqi';
+/* ================================================================
+   WebGL fluid shader background
+   ================================================================ */
 
-  /* ---- Cursor-following gradient ---- */
-  var bgAmbient = document.getElementById('bg-ambient');
-  var bgCore    = document.getElementById('bg-core');
-  var tx = 50, ty = 50; /* target */
-  var cx = 50, cy = 50; /* current (lerped) */
+var VERT = `
+attribute vec2 a_pos;
+varying vec2 v_uv;
+void main() {
+  v_uv = a_pos * 0.5 + 0.5;
+  gl_Position = vec4(a_pos, 0.0, 1.0);
+}
+`;
+
+var FRAG = `
+precision mediump float;
+uniform float u_time;
+uniform vec2  u_mouse;
+uniform vec2  u_res;
+varying vec2  v_uv;
+
+vec4 fastTanh(vec4 x) {
+  vec4 x2 = x * x;
+  return clamp(x * (27.0 + x2) / (27.0 + 9.0 * x2), -1.0, 1.0);
+}
+
+void main() {
+  vec2 r = u_res;
+  vec2 p = (v_uv * 2.0 - 1.0) * vec2(r.x / r.y, 1.0);
+  vec2 mouse = u_mouse * 2.0 - 1.0;
+
+  float mouseInfluence = length(mouse) * 0.5;
+  float zBase = 4.0 - 4.0 * abs(0.7 - dot(p, p));
+  float z = zBase + mouse.y * 2.0;
+
+  vec2 f = p * z;
+  vec2 i = vec2(0.0);
+  vec4 O = vec4(0.0);
+
+  for(int j = 0; j < 8; j++) {
+    i.y = float(j) + 1.0;
+    vec2 sinF = sin(f) + 1.0;
+    vec4 colorWave = vec4(sinF.x, sinF.y, sinF.x, sinF.y) * abs(f.x - f.y) * 1.5;
+    float mouseDist = length(p - mouse * vec2(r.x / r.y, 1.0)) * 2.0;
+    float neonBoost = 1.0 + (1.0 - smoothstep(0.0, 0.5, mouseDist)) * 0.8;
+    colorWave *= neonBoost;
+    O += colorWave;
+    float timeOffset = u_time + mouse.x * 3.0;
+    f += cos(f.yx * i.y + i + timeOffset) / i.y + 0.7;
+  }
+
+  vec4 fc = fastTanh(7.0 * exp(z - 4.0 - p.y * vec4(-1.0, 1.0, 2.0, 0.0)) / O);
+
+  /* Extract luminance from the fluid animation */
+  float lum = dot(fc.rgb, vec3(0.299, 0.587, 0.114));
+
+  /* Mouse glow contribution */
+  float glow = exp(-mouseInfluence * 4.0) * 0.3;
+  lum += glow * 0.4;
+  lum = clamp(lum, 0.0, 1.0);
+
+  /* Map luminance to blue monochrome palette:
+     dark (near black) → deep navy → bright blue */
+  vec3 dark  = vec3(0.0,  0.0,  0.04);
+  vec3 mid   = vec3(0.02, 0.04, 0.55);
+  vec3 light = vec3(0.15, 0.35, 1.0);
+
+  vec3 col = lum < 0.5
+    ? mix(dark,  mid,   lum * 2.0)
+    : mix(mid,   light, (lum - 0.5) * 2.0);
+
+  gl_FragColor = vec4(col, 1.0);
+}
+`;
+
+(function() {
+  var canvas = document.getElementById('bg-canvas');
+  var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  if (!gl) return;
+
+  function compile(type, src) {
+    var s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+  }
+
+  var prog = gl.createProgram();
+  gl.attachShader(prog, compile(gl.VERTEX_SHADER,   VERT));
+  gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+
+  /* Full-screen quad */
+  var buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+    -1,-1,  1,-1,  -1,1,
+    -1, 1,  1,-1,   1,1
+  ]), gl.STATIC_DRAW);
+
+  var aPos = gl.getAttribLocation(prog, 'a_pos');
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+  var uTime  = gl.getUniformLocation(prog, 'u_time');
+  var uMouse = gl.getUniformLocation(prog, 'u_mouse');
+  var uRes   = gl.getUniformLocation(prog, 'u_res');
+
+  var mx = 0.5, my = 0.5;
+  var tmx = 0.5, tmy = 0.5;
 
   document.addEventListener('mousemove', function(e) {
-    tx = (e.clientX / window.innerWidth)  * 100;
-    ty = (e.clientY / window.innerHeight) * 100;
+    tmx = e.clientX / window.innerWidth;
+    tmy = 1.0 - e.clientY / window.innerHeight;
   });
-
-  /* Also respond to touch */
   document.addEventListener('touchmove', function(e) {
     var t = e.touches[0];
-    tx = (t.clientX / window.innerWidth)  * 100;
-    ty = (t.clientY / window.innerHeight) * 100;
+    tmx = t.clientX / window.innerWidth;
+    tmy = 1.0 - t.clientY / window.innerHeight;
   }, { passive: true });
 
-  function tick() {
-    /* Smooth lerp — ambient follows slowly, core follows a bit faster */
-    cx += (tx - cx) * 0.04;
-    cy += (ty - cy) * 0.04;
-
-    var pos = cx.toFixed(2) + '% ' + cy.toFixed(2) + '%';
-
-    bgAmbient.style.background =
-      'radial-gradient(ellipse 55% 55% at ' + pos + ', ' +
-      '#0a00e6 0%, #05008a 22%, #020040 42%, #000010 62%, #000000 78%)';
-
-    bgCore.style.background =
-      'radial-gradient(ellipse 28% 28% at ' + pos + ', ' +
-      'rgba(30,20,255,0.35) 0%, rgba(10,0,200,0.15) 35%, transparent 65%)';
-
-    requestAnimationFrame(tick);
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    gl.viewport(0, 0, canvas.width, canvas.height);
   }
-  tick();
+  window.addEventListener('resize', resize);
+  resize();
 
-  /* ---- Password logic ---- */
-  var input   = document.getElementById('pw');
-  var hint    = document.getElementById('pw-hint');
-  var btn     = document.getElementById('pw-btn');
-  var lock    = document.getElementById('lock');
-  var content = document.getElementById('content');
+  var start = performance.now();
 
-  function unlock() {
-    if (input.value === PASSWORD) {
-      sessionStorage.setItem('shiqi-wip', '1');
-      lock.classList.add('out');
-      setTimeout(function() {
-        lock.style.display = 'none';
-        content.classList.add('visible');
-      }, 600);
-    } else {
-      input.classList.add('error');
-      hint.classList.add('show');
-      setTimeout(function() {
-        input.classList.remove('error');
-        input.value = '';
-        input.focus();
-      }, 400);
-    }
+  function frame() {
+    /* Smooth mouse lerp */
+    mx += (tmx - mx) * 0.04;
+    my += (tmy - my) * 0.04;
+
+    gl.uniform1f(uTime,  (performance.now() - start) / 1000.0);
+    gl.uniform2f(uMouse, mx, my);
+    gl.uniform2f(uRes,   canvas.width, canvas.height);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    requestAnimationFrame(frame);
   }
+  frame();
+})();
 
-  if (sessionStorage.getItem('shiqi-wip') === '1') {
-    lock.style.display = 'none';
-    content.style.transition = 'none';
-    content.classList.add('visible');
+/* ================================================================
+   Password logic
+   ================================================================ */
+var PASSWORD = 'shiqi';
+
+var input   = document.getElementById('pw');
+var hint    = document.getElementById('pw-hint');
+var btn     = document.getElementById('pw-btn');
+var lock    = document.getElementById('lock');
+var content = document.getElementById('content');
+
+function unlock() {
+  if (input.value === PASSWORD) {
+    sessionStorage.setItem('shiqi-wip', '1');
+    lock.classList.add('out');
+    setTimeout(function() {
+      lock.style.display = 'none';
+      content.classList.add('visible');
+    }, 600);
+  } else {
+    input.classList.add('error');
+    hint.classList.add('show');
+    setTimeout(function() {
+      input.classList.remove('error');
+      input.value = '';
+      input.focus();
+    }, 400);
   }
+}
 
-  btn.addEventListener('click', unlock);
-  input.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') unlock();
-    hint.classList.remove('show');
-  });
+if (sessionStorage.getItem('shiqi-wip') === '1') {
+  lock.style.display = 'none';
+  content.style.transition = 'none';
+  content.classList.add('visible');
+}
+
+btn.addEventListener('click', unlock);
+input.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') unlock();
+  hint.classList.remove('show');
+});
 </script>
 </body>
 </html>
